@@ -119,6 +119,8 @@ class SSPquadUP : public Element
     void GetSolidStiffness(void);              // compute solid phase stiffness matrix
     void GetSolidMass(void);                   // compute solid phase mass matrix
     void GetPermeabilityMatrix(void);          // compute permeability matrix
+    Matrix GetCurTangent(void);                // get current solid phase stiffness for damping
+    Matrix GetIniTangent(void);                // get initial solid phase stiffness for damping
     // LM change        
 	void setPressureLoadAtNodes(void);
     // LM change

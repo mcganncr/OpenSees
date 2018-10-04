@@ -434,13 +434,21 @@ SSPquadUP::getDamp(void)
     // solid phase stiffness matrix
     GetSolidStiffness();
 
-    // contribution of stiffness matrix for Rayleigh damping
+    /*// contribution of stiffness matrix for Rayleigh damping
     if (betaK != 0.0) {
         dampC.addMatrix(1.0, mSolidK, betaK);
     } if (betaK0 != 0.0) {
         dampC.addMatrix(1.0, mSolidK, betaK0);
     } if (betaKc != 0.0) {
         dampC.addMatrix(1.0, mSolidK, betaKc);
+    }*/
+    // contribution of stiffness matrix for Rayleigh damping
+    if (betaK != 0.0) {
+        dampC.addMatrix(1.0, this->GetCurTangent(), betaK);
+    } if (betaK0 != 0.0) {
+        dampC.addMatrix(1.0, this->GetIniTangent(), betaK0);
+    } if (betaKc != 0.0) {
+        dampC.addMatrix(1.0, this->GetCurTangent(), betaKc);
     }
 
     // contribution of mass matrix for Rayleigh damping
@@ -492,8 +500,36 @@ SSPquadUP::getMass(void)
 {
     mMass.Zero();
 
-    // compute compressibility matrix term
+    // compute compressibility matrix term - single point integration
     double oneOverQ = -0.25*J0*mThickness*mPorosity/fBulk;
+
+    // compute compressibility matrix term - full integration
+    /*Matrix S(4,4);
+    Vector shp(4);
+    Vector s(4);
+    Vector t(4);
+    double root3 = sqrt(3.0);
+
+    // local coordinates
+    s(0) = -1.0/root3;
+    s(1) =  1.0/root3;
+    s(2) =  1.0/root3;
+    s(3) = -1.0/root3;
+    t(0) = -1.0/root3;
+    t(1) = -1.0/root3;
+    t(2) =  1.0/root3;
+    t(3) =  1.0/root3;
+
+    S.Zero();
+    for (int i = 0; i < 4; i++) {
+        shp(0) =  0.25*(s(i) - 1.0)*(t(i) - 1.0);
+        shp(1) = -0.25*(s(i) + 1.0)*(t(i) - 1.0);
+        shp(2) =  0.25*(s(i) + 1.0)*(t(i) + 1.0);
+        shp(3) = -0.25*(s(i) - 1.0)*(t(i) + 1.0);
+
+        S = S + shp%shp;
+    }
+    S = -1.0*S*mThickness*mPorosity/fBulk;*/
 
     // get mass density from the material
     double density = theMaterial->getRho();
@@ -535,8 +571,10 @@ SSPquadUP::getMass(void)
             mMass(IIp1,JJp1) = mSolidM(Ip1,Jp1);
             mMass(II,JJp1)   = mSolidM(I,Jp1);
 
-            // contribution of compressibility matrix
+            // contribution of compressibility matrix - ssp
             mMass(IIp2,JJp2) = Kp(i,j) + oneOverQ;
+            // contribution of compressibility matrix - full
+            //mMass(IIp2,JJp2) = Kp(i,j) + S(i,j);
         }
     }
 
@@ -789,28 +827,32 @@ SSPquadUP::sendSelf(int commitTag, Channel &theChannel)
   
     // SSPquadUP packs its data into a Vector and sends this to theChannel
     // along with its dbTag and the commitTag passed in the arguments
+	static Vector data(20);
+    data(0)  = this->getTag();
+    data(1)  = mThickness;
+    data(2)  = fBulk;
+    data(3)  = fDens;
+    data(4)  = perm[0];
+    data(5)  = perm[1];
+    data(6)  = mPorosity;
+    data(7)  = b[0];
+    data(8)  = b[1];
     //LM change
-	static Vector data(15);
-    data(0) = this->getTag();
-    data(1) = mThickness;
-    data(2) = fBulk;
-    data(3) = fDens;
-    data(4) = perm[0];
-    data(5) = perm[1];
-    data(6) = mPorosity;
-    data(7) = b[0];
-    data(8) = b[1];
-	data(9) = P[0];
+	data(9)  = P[0];
 	data(10) = P[1];
 	data(11) = P[2];
 	data(12) = P[3];
-    data(13) = theMaterial->getClassTag();         
     //LM change
+    data(13) = mAlpha;
+    data(14) = theMaterial->getClassTag();         
+    
+    data(15) = alphaM;
+    data(16) = betaK;
+    data(17) = betaK0;
+    data(18) = betaKc;
         
     // Now SSPquadUP sends the ids of its materials
     int matDbTag = theMaterial->getDbTag();
-  
-    static ID idData(12);
   
     // NOTE: we do have to ensure that the material has a database
     // tag if we are sending to a database channel.
@@ -820,7 +862,7 @@ SSPquadUP::sendSelf(int commitTag, Channel &theChannel)
             theMaterial->setDbTag(matDbTag);
         }
     }
-    data(14) = matDbTag;
+    data(19) = matDbTag;
 
     res += theChannel.sendVector(dataTag, commitTag, data);
     if (res < 0) {
@@ -853,7 +895,7 @@ SSPquadUP::recvSelf(int commitTag, Channel &theChannel, FEM_ObjectBroker &theBro
 
     // SSPquadUP creates a Vector, receives the Vector and then sets the 
     // internal data with the data in the Vector
-    static Vector data(6);
+    static Vector data(20);
     res += theChannel.recvVector(dataTag, commitTag, data);
     if (res < 0) {
         opserr << "WARNING SSPquadUP::recvSelf() - failed to receive Vector\n";
@@ -862,19 +904,26 @@ SSPquadUP::recvSelf(int commitTag, Channel &theChannel, FEM_ObjectBroker &theBro
   
     this->setTag((int)data(0));
     mThickness = data(1);
-    fBulk = data(2);
-    fDens = data(3);
-    perm[0] = data(4);
-    perm[1] = data(5);
-    mPorosity = data(6);
-    b[0] = data(7);
-    b[1] = data(8);
+    fBulk      = data(2);
+    fDens      = data(3);
+    perm[0]    = data(4);
+    perm[1]    = data(5);
+    mPorosity  = data(6);
+    b[0]       = data(7);
+    b[1]       = data(8);
 	//LM change
 	P[0] = data(9);
 	P[1] = data(10);
 	P[2] = data(11);
 	P[3] = data(12);
     //LM change
+    mAlpha = data(13);
+    int matClass = (int)data(14);
+    
+    alphaM = data(15);
+    betaK  = data(16);
+    betaK0 = data(17);
+    betaKc = data(18);
 
     // SSPquadUP now receives the tags of its four external nodes
     res += theChannel.recvID(dataTag, commitTag, mExternalNodes);
@@ -885,10 +934,7 @@ SSPquadUP::recvSelf(int commitTag, Channel &theChannel, FEM_ObjectBroker &theBro
 
     // finally, SSPquadUP creates a material object of the correct type, sets its
     // database tag, and asks this new object to receive itself
-    //LM change
-	int matClass = (int)data(13);
-    int matDb    = (int)data(14);
-    //LM change
+    int matDb = (int)data(19);
 
     // check if material object exists and that it is the right type
     if ((theMaterial == 0) || (theMaterial->getClassTag() != matClass)) {
@@ -1178,6 +1224,38 @@ SSPquadUP::GetSolidStiffness(void)
 	return;
 }
 
+Matrix
+SSPquadUP::GetCurTangent(void)
+// this function computes the current tangent stiffness for the damping 
+{
+    Matrix result(8,8);
+    result.Zero();
+
+    // get material tangent
+    const Matrix &Cmat = theMaterial->getTangent();
+
+    result = Kstab;
+    result.addMatrixTripleProduct(1.0, Mmem, Cmat, 4.0*J0*mThickness);
+
+    return result;
+}
+
+Matrix
+SSPquadUP::GetIniTangent(void)
+// this function computes the current tangent stiffness for the damping 
+{
+    Matrix result(8,8);
+    result.Zero();
+
+    // get material tangent
+    const Matrix &Cmat = theMaterial->getInitialTangent();
+
+    result = Kstab;
+    result.addMatrixTripleProduct(1.0, Mmem, Cmat, 4.0*J0*mThickness);
+
+    return result;
+}
+
 void
 SSPquadUP::GetSolidMass(void)
 // this function computes the mass matrix for the solid phase
@@ -1205,6 +1283,7 @@ void
 SSPquadUP::GetPermeabilityMatrix(void)
 // this function computes the permeability matrix for the element
 {
+    // single point integration procedure for permeability matrix
 	mPerm.Zero();
 	Matrix k(2,2);
 	Matrix dNp(2,4);
@@ -1219,6 +1298,63 @@ SSPquadUP::GetPermeabilityMatrix(void)
 
 	// compute permeability matrix
 	mPerm.addMatrixTripleProduct(1.0, dNp, k, 4.0*J0*mThickness);
+
+    /*// full integration procedure for permeability matrix
+    mPerm.Zero();
+    double root3 = sqrt(3.0);
+    Vector s(4); 
+    Vector t(4); 
+    Matrix k(2,2);
+    Matrix dNloc(4,2);
+    Matrix Jmat(2,2);
+    Matrix Jinv(2,2);
+    Matrix dNU(4,2);
+    Matrix dNT(2,4);
+
+    // permeability tensor
+    k(0,0) = perm[0];
+    k(1,1) = perm[1];
+
+    // local coordinates
+    s(0) = -1.0/root3;
+    s(1) =  1.0/root3;
+    s(2) =  1.0/root3;
+    s(3) = -1.0/root3;
+    t(0) = -1.0/root3;
+    t(1) = -1.0/root3;
+    t(2) =  1.0/root3;
+    t(3) =  1.0/root3;
+
+    for (int i = 0; i < 4; i++) {
+
+        double dsN1 =  0.25*(t(i) - 1);
+        double dsN2 = -0.25*(t(i) - 1);
+        double dsN3 =  0.25*(t(i) + 1);
+        double dsN4 = -0.25*(t(i) + 1);
+
+        double dtN1 =  0.25*(s(i) - 1);
+        double dtN2 = -0.25*(s(i) + 1);
+        double dtN3 =  0.25*(s(i) + 1);
+        double dtN4 = -0.25*(s(i) - 1);
+
+        dNloc(0,0) = dsN1; dNloc(0,1) = dtN1;
+        dNloc(1,0) = dsN2; dNloc(1,1) = dtN2;
+        dNloc(2,0) = dsN3; dNloc(2,1) = dtN3;
+        dNloc(3,0) = dsN4; dNloc(3,1) = dtN4;
+
+        Jmat = mNodeCrd*dNloc;
+        Jmat.Invert(Jinv);
+
+        dNU = dNloc*Jinv;
+
+        double detJ = Jmat(0,0)*Jmat(1,1) - Jmat(0,1)*Jmat(1,0);
+
+        dNT(0,0) = dNU(0,0); dNT(0,1) = dNU(1,0); dNT(0,2) = dNU(2,0); dNT(0,3) = dNU(3,0);
+        dNT(1,0) = dNU(0,1); dNT(1,1) = dNU(1,1); dNT(1,2) = dNU(2,1); dNT(1,3) = dNU(3,1);
+
+        mPerm.addMatrixTripleProduct(1.0, dNT, k, detJ*mThickness);
+    }*/
+
 
 	return;
 }
