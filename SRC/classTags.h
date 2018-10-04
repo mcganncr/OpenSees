@@ -133,6 +133,7 @@
 #define MAT_TAG_ENTMaterial			14
 #define MAT_TAG_Penalty				15
 #define MAT_TAG_MinMax				16
+#define MAT_TAG_TensionOnly			1601
 #define MAT_TAG_BoucWen				17
 #define MAT_TAG_Pinching4			18
 #define MAT_TAG_BarSlip				19
@@ -706,7 +707,10 @@
 #define ELE_TAG_AxEqDispBeamColumn2d      178
 #define ELE_TAG_FourNodeTetrahedron       179
 #define ELE_TAG_TriSurfaceLoad            180
-#define ELE_TAG_QuadBeamEmbedContact      500
+#define ELE_TAG_QuadBeamEmbedContact      181
+#define ELE_TAG_EmbeddedBeamInterfaceL    182
+#define ELE_TAG_EmbeddedBeamInterfaceP    183
+#define ELE_TAG_EmbeddedEPBeamInterface   184
 
 #define FRN_TAG_Coulomb            1
 #define FRN_TAG_VelDependent       2
