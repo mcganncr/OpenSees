@@ -212,6 +212,10 @@
 #define MAT_TAG_ConcreteECThermal		95   //L.Jiang [SIF]
 #define MAT_TAG_BoucWenOriginal                 96
 #define MAT_TAG_DamperMaterial                  97
+#define MAT_TAG_SPSW02			                98	//SAJalali
+#define MAT_TAG_Steel02Fatigue					99 //nassermarafi
+#define MAT_TAG_Concrete02IS					100 //nassermarafi
+#define MAT_TAG_ConfinedConcrete01              99
 
 #define MAT_TAG_PySimple1                    205
 #define MAT_TAG_TzSimple1                    206
@@ -308,14 +312,15 @@
 #define SEC_TAG_LayeredShellFiberSectionThermal 35     //L.Jiang[SIF]
 #define SEC_TAG_BiaxialHysteretic 36
 
-#define SEC_TAG_McftSection2dfiber 7601
+#define SEC_TAG_MCFTFiberSection2d 7601
 
 #define SECTION_INTEGRATION_TAG_WideFlange 1
 #define SECTION_INTEGRATION_TAG_RC 2
 #define SECTION_INTEGRATION_TAG_RCT 3
 #define SECTION_INTEGRATION_TAG_RCTUM 4
 #define SECTION_INTEGRATION_TAG_RCCIRCULAR 5
-#define SECTION_INTEGRATION_TAG_Tube 6
+#define SECTION_INTEGRATION_TAG_RCTUNNEL 6
+#define SECTION_INTEGRATION_TAG_Tube 7
 
 #define ND_TAG_WrapperNDMaterial		9
 #define ND_TAG_ElasticIsotropic			10
@@ -377,6 +382,7 @@
 #define ND_TAG_FAPrestressedConcretePlaneStress  109
 #define ND_TAG_FAFourSteelPCPlaneStress  110
 #define ND_TAG_RAFourSteelPCPlaneStress  111
+#define ND_TAG_PressureDependMultiYield03		112
 
 #define ND_TAG_J2PlaneStrain                  3005
 #define ND_TAG_J2PlaneStress                  3006
@@ -395,6 +401,7 @@
 #define ND_TAG_PlaneStrainMaterial          2003
 #define ND_TAG_BeamFiberMaterial		2002
 #define ND_TAG_BeamFiberMaterial2d		2004
+#define ND_TAG_BeamFiberMaterial2dPS		2005
 #define ND_TAG_CompressibleFluid		3001
 #define ND_TAG_GeneralizedPlasticity 3002
 #define ND_TAG_J2Plasticity02  3003
@@ -511,10 +518,12 @@
 #define LOAD_TAG_SelfWeight              10 // C.McGann, U.W.
 #define LOAD_TAG_Beam2dThermalAction      11
 #define LOAD_TAG_Beam2dPartialUniformLoad 12
+#define LOAD_TAG_Beam3dPartialUniformLoad 121
 #define LOAD_TAG_Beam3dThermalAction      13 // L.Jiang [ SIF ]
 #define LOAD_TAG_ShellThermalAction       14 // L.Jiang [ SIF ]
 #define LOAD_TAG_NodalThermalAction       15 //L.Jiang [ SIF ]
 #define LOAD_TAG_ThermalActionWrapper     16 //L.Jiang [ SIF ]
+#define LOAD_TAG_LysmerVelocityLoader      17  //Jose Abell (UANDES)
 
 
 #define MAT_TAG_IsotropicLinElastic         1001
@@ -586,6 +595,7 @@
 #define ELE_TAG_ConstantPressureVolumeQuad 60
 #define ELE_TAG_NineNodeMixedQuad          61
 #define ELE_TAG_DispBeamColumn2d        62
+#define ELE_TAG_DispBeamColumnNL2d        621
 #define ELE_TAG_TimoshenkoBeamColumn2d  63
 #define ELE_TAG_DispBeamColumn3d        64
 #define ELE_TAG_DispBeamColumnWarping3d        641
@@ -711,6 +721,11 @@
 #define ELE_TAG_EmbeddedBeamInterfaceL    182
 #define ELE_TAG_EmbeddedBeamInterfaceP    183
 #define ELE_TAG_EmbeddedEPBeamInterface   184
+#define ELE_TAG_LysmerTriangle            185
+#define ELE_TAG_TaylorHood2D              186
+#define ELE_TAG_PFEMElement2DQuasi        187
+#define ELE_TAG_MINI                      188
+#define ELE_TAG_PFEMElement3DBubble       189
 
 #define FRN_TAG_Coulomb            1
 #define FRN_TAG_VelDependent       2
@@ -924,6 +939,8 @@
 #define LinSOE_TAGS_PFEMLinSOE 26
 #define LinSOE_TAGS_SProfileSPDLinSOE		27
 #define LinSOE_TAGS_PFEMCompressibleLinSOE 28
+#define LinSOE_TAGS_PFEMQuasiLinSOE 29
+#define LinSOE_TAGS_PFEMDiaLinSOE 30
 
 
 #define SOLVER_TAGS_FullGenLinLapackSolver  	1
@@ -957,6 +974,8 @@
 #define SOLVER_TAGS_CulaSparseS4                        29
 #define SOLVER_TAGS_CulaSparseS5                        30
 #define SOLVER_TAGS_CuSP                                31
+#define SOLVER_TAGS_PFEMQuasiSolver                     32
+#define SOLVER_TAGS_PFEMDiaSolver                       33
 
 #define RECORDER_TAGS_ElementRecorder		1
 #define RECORDER_TAGS_NodeRecorder		2
@@ -978,6 +997,7 @@
 #define RECORDER_TAGS_NormEnvelopeElementRecorder	18
 #define RECORDER_TAGS_PVDRecorder               19
 #define RECORDER_TAGS_MPCORecorder               20
+#define RECORDER_TAGS_GmshRecorder               21
 
 #define OPS_STREAM_TAGS_FileStream		1
 #define OPS_STREAM_TAGS_StandardStream		2
@@ -1019,6 +1039,7 @@
 #define RANDOM_VARIABLE_uniform				17
 #define RANDOM_VARIABLE_weibull				18
 #define RANDOM_VARIABLE_userdefined             19
+#define RANDOM_VARIABLE_python             20
 
 #define RANDOM_VARIABLE_POSITIONER        1
 #define PARAMETER_POSITIONER              2

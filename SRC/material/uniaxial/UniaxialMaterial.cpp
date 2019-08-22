@@ -49,6 +49,16 @@ bool OPS_addUniaxialMaterial(UniaxialMaterial *newComponent) {
   return theUniaxialMaterialObjects.addComponent(newComponent);
 }
 
+bool OPS_removeUniaxialMaterial(int tag)
+{
+    TaggedObject* obj = theUniaxialMaterialObjects.removeComponent(tag);
+    if (obj != 0) {
+	delete obj;
+	return true;
+    }
+    return false;
+}
+
 UniaxialMaterial *OPS_getUniaxialMaterial(int tag) {
 
   TaggedObject *theResult = theUniaxialMaterialObjects.getComponentPtr(tag);
@@ -214,7 +224,12 @@ UniaxialMaterial::setResponse(const char **argv, int argc,
        (strcmp(argv[0],"stressANDstrainANDtangent") == 0) ||
        (strstr(argv[0],"stressSensitivity") != 0) ||
        (strstr(argv[0],"strainSensitivity") != 0)||
-	  (strstr(argv[0], "TempElong") != 0)) {
+	  (strstr(argv[0], "TempElong") != 0)
+	  //by SAJalali
+	  || (strstr(argv[0], "energy") != 0) ||
+	  (strstr(argv[0], "Energy") != 0)
+	  
+	  ) {
     
     theOutput.tag("UniaxialMaterialOutput");
     theOutput.attr("matType", this->getClassType());
@@ -283,7 +298,13 @@ UniaxialMaterial::setResponse(const char **argv, int argc,
 		theOutput.tag("ResponseType", "Elong11");
 		theResponse = new MaterialResponse(this, 7, Vector(2));
 	}
-    
+	// by SAJalali:
+	else if ((strcmp(argv[0], "energy") == 0) ||
+		(strcmp(argv[0], "Energy") == 0)) {
+		theOutput.tag("ResponseType", "energy");
+		theResponse = new MaterialResponse(this, 9, 0.0);
+	}
+
     theOutput.endTag();
   }
   
@@ -359,7 +380,11 @@ UniaxialMaterial::getResponse(int responseID, Information &matInfo)
 		  tempData = infoData.getData();
 		  matInfo.setVector(tempData);
 		  return 0;
-  default:      
+	  //by SAJalali
+	  case 9:
+		  matInfo.setDouble(this->getEnergy());
+		  return 0;
+	  default:
     return -1;
   }
 }
@@ -411,7 +436,7 @@ UniaxialMaterial::commitSensitivity(double strainSensitivity, int gradIndex, int
 double
 UniaxialMaterial::getInitialTangent (void)
 {
-	opserr << "UniaxialMaterial::getInitialTangent() -- this mehtod " << endln
+	opserr << "UniaxialMaterial::getInitialTangent() -- this method " << endln
 		<< " is not implemented for the selected material. " << endln;
 	return 0.0;
 }

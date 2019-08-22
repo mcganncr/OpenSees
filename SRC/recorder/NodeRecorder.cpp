@@ -36,6 +36,7 @@
 #include <Matrix.h>
 #include <FE_Datastore.h>
 #include <FEM_ObjectBroker.h>
+#include <Pressure_Constraint.h>
 #include <MeshRegion.h>
 #include <TimeSeries.h>
 
@@ -313,17 +314,18 @@ NodeRecorder::NodeRecorder(const ID &dofs,
 			   int psensitivity,
 			   const char *dataToStore,
 			   Domain &theDom,
-			   OPS_Stream &theOutputHandler,
+			   OPS_Stream &theOutput,
 			   double dT,
 			   bool timeFlag,
 			   TimeSeries **theSeries)
 :Recorder(RECORDER_TAGS_NodeRecorder),
  theDofs(0), theNodalTags(0), theNodes(0), response(0), 
- theDomain(&theDom), theOutputHandler(&theOutputHandler),
+ theDomain(&theDom), theOutputHandler(&theOutput),
  echoTimeFlag(timeFlag), dataFlag(0), 
  deltaT(dT), nextTimeStampToRecord(0.0), 
  sensitivity(psensitivity), 
- initializationDone(false), numValidNodes(0), addColumnInfo(0), theTimeSeries(theSeries), timeSeriesValues(0)
+ initializationDone(false), numValidNodes(0), addColumnInfo(0), 
+ theTimeSeries(theSeries), timeSeriesValues(0)
 {
 
   //
@@ -404,6 +406,9 @@ NodeRecorder::NodeRecorder(const ID &dofs,
   } else if (((strcmp(dataToStore, "nodalRayleighForces") == 0))) {
     dataFlag = 10001;
 
+  } else if (((strcmp(dataToStore, "pressure") == 0))) {
+    dataFlag = 10002;
+
   } else if ((strcmp(dataToStore, "dispNorm") == 0)) {
     dataFlag = 10000;
 
@@ -436,6 +441,13 @@ NodeRecorder::NodeRecorder(const ID &dofs,
     dataFlag = 10;
     opserr << "NodeRecorder::NodeRecorder - dataToStore " << dataToStore;
     opserr << "not recognized (disp, vel, accel, incrDisp, incrDeltaDisp)\n";
+  }
+
+  if (dataFlag == 7 || dataFlag == 8 || dataFlag == 9) {
+    if (timeFlag == true)
+      theOutputHandler->setAddCommon(2);
+    else
+      theOutputHandler->setAddCommon(1);
   }
 }
 
@@ -539,7 +551,7 @@ NodeRecorder::record(int commitTag, double timeStamp)
       for (int i=0; i<numValidNodes; i++) {
 
 	int cnt = i*numDOF + timeOffset; 
-	if (dataFlag == 10000)
+	if (dataFlag == 10000 || dataFlag == 10002)
 	  cnt = i + timeOffset;
 
 	Node *theNode = theNodes[i];
@@ -610,6 +622,22 @@ NodeRecorder::record(int commitTag, double timeStamp)
 
 	  response(cnt) = sqrt(sum);
 	  cnt++;
+
+	} else if (dataFlag == 10002) {
+
+	    if (theTimeSeries != 0) {
+		timeSeriesTerm = timeSeriesValues[0];
+	    }
+	    
+	    // get node pressure
+	    double pressure = timeSeriesTerm;
+	    Pressure_Constraint* pc = theDomain->getPressure_Constraint(theNode->getTag());
+	    if (pc != 0) {
+		pressure += pc->getPressure();
+	    }
+
+	    response(cnt) = pressure;
+	    cnt++;
 
 	} else if (dataFlag == 2) {
 
@@ -1104,8 +1132,9 @@ NodeRecorder::initialize(void)
 
 
   int numValidResponse = numValidNodes*theDofs->Size() + timeOffset;
-  if (dataFlag == 10000)
-    numValidResponse = numValidNodes + timeOffset;  
+  if (dataFlag == 10000 || dataFlag == 10002) {
+      numValidResponse = numValidNodes + timeOffset;
+  }
 
   response.resize(numValidResponse);
   response.Zero();
@@ -1243,4 +1272,15 @@ NodeRecorder::initialize(void)
   initializationDone = true;
 
   return 0;
+}
+//added by SAJalali
+double NodeRecorder::getRecordedValue(int clmnId, int rowOffset, bool reset)
+{
+	double res = 0;
+	if (!initializationDone)
+		return res;
+	if (clmnId >= response.Size())
+		return res;
+	res = response(clmnId);
+	return res;
 }

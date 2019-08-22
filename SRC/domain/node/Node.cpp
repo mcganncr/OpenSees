@@ -109,7 +109,10 @@ int OPS_Node()
 		return -1;
 	    }
 	    disp.resize(ndf);
-	    if(OPS_GetDoubleInput(&ndf, &disp(0)) < 0) return -1;
+	    if(OPS_GetDoubleInput(&ndf, &disp(0)) < 0) {
+		opserr << "WARNING: failed to read disp\n";
+		return -1;
+	    }
 
 	} else if(strcmp(type,"-vel")==0 || strcmp(type,"-Vel")==0) {
 	    if(OPS_GetNumRemainingInputArgs() < ndf) {
@@ -117,7 +120,10 @@ int OPS_Node()
 		return -1;
 	    }
 	    vel.resize(ndf);
-	    if(OPS_GetDoubleInput(&ndf, &vel(0)) < 0) return -1;
+	    if(OPS_GetDoubleInput(&ndf, &vel(0)) < 0) {
+		opserr << "WARNING: failed to read vel\n";
+		return -1;
+	    }
 
 	} else if(strcmp(type,"-mass")==0 || strcmp(type,"-Mass")==0) {
 	    if(OPS_GetNumRemainingInputArgs() < ndf) {
@@ -125,7 +131,10 @@ int OPS_Node()
 		return -1;
 	    }
 	    Vector data(ndf);
-	    if(OPS_GetDoubleInput(&ndf, &data(0)) < 0) return -1;
+	    if(OPS_GetDoubleInput(&ndf, &data(0)) < 0) {
+		opserr << "WARNING: failed to read mass\n";
+		return -1;
+	    }
 	    ndmass.resize(ndf,ndf);
 	    ndmass.Zero();
 	    for(int i=0; i<ndf; i++) {
@@ -138,7 +147,21 @@ int OPS_Node()
 		return -1;
 	    }
 	    dispLoc.resize(ndm);
-	    if(OPS_GetDoubleInput(&ndm, &dispLoc(0)) < 0) return -1;
+	    if(OPS_GetDoubleInput(&ndm, &dispLoc(0)) < 0) {
+		opserr << "WARNING: failed to read dispLoc\n";
+		return -1;
+	    }
+
+	} else if(strcmp(type,"-ndf")==0 || strcmp(type,"-NDF")==0) {
+	    if(OPS_GetNumRemainingInputArgs() < 1) {
+		opserr<<"incorrect number for ndf\n";
+		return -1;
+	    }
+	    int numdata = 1;
+	    if(OPS_GetIntInput(&numdata, &ndf) < 0) {
+		opserr << "WARNING: failed to read ndf\n";
+		return -1;
+	    }
 
 	}
     }
@@ -163,7 +186,7 @@ int OPS_Node()
 	theNode->setTrialDisp(disp);
     }
     if(vel.Size() == ndf) {
-	theNode->setTrialVel(disp);
+	theNode->setTrialVel(vel);
     }
     if(ndmass.noRows() == ndf) {
 	theNode->setMass(ndmass);
@@ -257,33 +280,6 @@ Node::Node(int tag, int ndof, double Crd1, Vector *dLoc)
   }
   
   index = -1;
-  if (numMatrices != 0) {
-    for (int i=0; i<numMatrices; i++)
-      if (theMatrices[i]->noRows() == ndof) {
-	index = i;
-	i = numMatrices;
-      }
-  }
-  if (index == -1) {
-    Matrix **nextMatrices = new Matrix *[numMatrices+1];
-    if (nextMatrices == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    for (int j=0; j<numMatrices; j++)
-      nextMatrices[j] = theMatrices[j];
-    Matrix *theMatrix = new Matrix(ndof, ndof);
-    if (theMatrix == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    nextMatrices[numMatrices] = theMatrix;
-    if (numMatrices != 0) 
-      delete [] theMatrices;
-    index = numMatrices;
-    numMatrices++;
-    theMatrices = nextMatrices;
-  }
 }
 
 
@@ -317,33 +313,6 @@ Node::Node(int tag, int ndof, double Crd1, double Crd2, Vector *dLoc)
   }
   
   index = -1;
-  if (numMatrices != 0) {
-    for (int i=0; i<numMatrices; i++)
-      if (theMatrices[i]->noRows() == ndof) {
-	index = i;
-	i = numMatrices;
-      }
-  }
-  if (index == -1) {
-    Matrix **nextMatrices = new Matrix *[numMatrices+1];
-    if (nextMatrices == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    for (int j=0; j<numMatrices; j++)
-      nextMatrices[j] = theMatrices[j];
-    Matrix *theMatrix = new Matrix(ndof, ndof);
-    if (theMatrix == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    nextMatrices[numMatrices] = theMatrix;
-    if (numMatrices != 0) 
-      delete [] theMatrices;
-    index = numMatrices;
-    numMatrices++;
-    theMatrices = nextMatrices;
-  }
 }
 
 
@@ -379,33 +348,6 @@ Node::Node(int tag, int ndof, double Crd1, double Crd2, Vector *dLoc)
   }
   
   index = -1;
-  if (numMatrices != 0) {
-    for (int i=0; i<numMatrices; i++)
-      if (theMatrices[i]->noRows() == ndof) {
-	index = i;
-	i = numMatrices;
-      }
-  }
-  if (index == -1) {
-    Matrix **nextMatrices = new Matrix *[numMatrices+1];
-    if (nextMatrices == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    for (int j=0; j<numMatrices; j++)
-      nextMatrices[j] = theMatrices[j];
-    Matrix *theMatrix = new Matrix(ndof, ndof);
-    if (theMatrix == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    nextMatrices[numMatrices] = theMatrix;
-    if (numMatrices != 0) 
-      delete [] theMatrices;
-    index = numMatrices;
-    numMatrices++;
-    theMatrices = nextMatrices;
-  }
 }
 
 
@@ -495,33 +437,6 @@ Node::Node(const Node &otherNode, bool copyMass)
   }
 
   index = -1;
-  if (numMatrices != 0) {
-    for (int i=0; i<numMatrices; i++)
-      if (theMatrices[i]->noRows() == numberDOF) {
-	index = i;
-	i = numMatrices;
-      }
-  }
-  if (index == -1) {
-    Matrix **nextMatrices = new Matrix *[numMatrices+1];
-    if (nextMatrices == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    for (int j=0; j<numMatrices; j++)
-      nextMatrices[j] = theMatrices[j];
-    Matrix *theMatrix = new Matrix(numberDOF, numberDOF);
-    if (theMatrix == 0) {
-      opserr << "Element::getTheMatrix - out of memory\n";
-      exit(-1);
-    }
-    nextMatrices[numMatrices] = theMatrix;
-    if (numMatrices != 0) 
-      delete [] theMatrices;
-    index = numMatrices;
-    numMatrices++;
-    theMatrices = nextMatrices;
-  }  
 }
 
 
@@ -1240,6 +1155,10 @@ Node::revertToStart()
 const Matrix &
 Node::getMass(void) 
 {
+    if (index == -1) {
+	setGlobalMatrices();
+    }
+    
     // make sure it was created before we return it
     if (mass == 0) {
       theMatrices[index]->Zero();
@@ -1259,6 +1178,10 @@ Node::setRayleighDampingFactor(double alpham) {
 const Matrix &
 Node::getDamp(void) 
 {
+    if (index == -1) {
+	setGlobalMatrices();
+    }
+    
     // make sure it was created before we return it
     if (mass == 0 || alphaM == 0.0) {
       theMatrices[index]->Zero();
@@ -1275,6 +1198,10 @@ Node::getDamp(void)
 const Matrix &
 Node::getDampSensitivity(void) 
 {
+    if (index == -1) {
+	setGlobalMatrices();
+    }
+    
     // make sure it was created before we return it
     if (mass == 0 || alphaM == 0.0) {
       theMatrices[index]->Zero();
@@ -1914,6 +1841,10 @@ Node::createAccel(void)
 Matrix
 Node::getMassSensitivity(void)
 {
+    if (index == -1) {
+	setGlobalMatrices();
+    }
+    
 	if (mass == 0) {
 		theMatrices[index]->Zero();
 		return *theMatrices[index];
@@ -2386,3 +2317,38 @@ Node::setNodalThermalActionPtr(NodalThermalAction* theAction)
 	theNodalThermalActionPtr = theAction;
 }
 //Add Pointer to NodalThermalAction id applicable-----end------L.Jiang, {SIF]
+
+int
+Node::setGlobalMatrices()
+{
+    if (index == -1) {
+	for (int i=0; i<numMatrices; i++) {
+	    if (theMatrices[i]->noRows() == numberDOF) {
+		index = i;
+		i = numMatrices;
+	    }
+	}
+    }
+    if (index == -1) {
+	Matrix **nextMatrices = new Matrix *[numMatrices+1];
+	if (nextMatrices == 0) {
+	    opserr << "Element::getTheMatrix - out of memory\n";
+	    exit(-1);
+	}
+	for (int j=0; j<numMatrices; j++)
+	    nextMatrices[j] = theMatrices[j];
+	Matrix *theMatrix = new Matrix(numberDOF, numberDOF);
+	if (theMatrix == 0) {
+	    opserr << "Element::getTheMatrix - out of memory\n";
+	    exit(-1);
+	}
+	nextMatrices[numMatrices] = theMatrix;
+	if (numMatrices != 0) 
+	    delete [] theMatrices;
+	index = numMatrices;
+	numMatrices++;
+	theMatrices = nextMatrices;
+    }
+
+    return 0;
+}

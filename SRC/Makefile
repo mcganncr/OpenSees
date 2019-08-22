@@ -165,8 +165,11 @@ TCL_COMMAND_LIBS = $(FE)/domain/pattern/TclPatternCommand.o \
 	$(FE)/element/beamWithHinges/TclBeamWithHingesBuilder.o \
 	$(FE)/element/frictionBearing/frictionModel/TclModelBuilderFrictionModelCommand.o \
 	$(FE)/element/PFEMElement/TclModelBuilder_addPFEMElement.o \
-	$(FE)/material/uniaxial/backbone/TclModelBuilderBackboneCommand.o \
 	$(FE)/material/uniaxial/TclModelBuilderUniaxialMaterialCommand.o \
+	$(FE)/material/uniaxial/backbone/TclModelBuilderBackboneCommand.o \
+	$(FE)/material/uniaxial/stiffness/TclModelBuilderStiffnessDegradationCommand.o \
+	$(FE)/material/uniaxial/strength/TclModelBuilderStrengthDegradationCommand.o \
+	$(FE)/material/uniaxial/unloading/TclModelBuilderUnloadingRuleCommand.o \
 	$(FE)/material/nD/TclModelBuilderNDMaterialCommand.o \
 	$(FE)/material/section/yieldSurface/TclModelBuilderYS_SectionCommand.o \
 	$(FE)/material/section/TclModelBuilderSectionCommand.o \
@@ -215,6 +218,7 @@ GLF_LIBS = $(FE)/element/zeroLength/ZeroLength.o \
 	$(FE)/element/zeroLength/ZeroLengthSection.o \
 	$(FE)/element/zeroLength/CoupledZeroLength.o \
 	$(FE)/element/zeroLength/ZeroLengthND.o \
+	$(FE)/element/zeroLength/ZeroLengthVG_HG.o \
 	$(FE)/element/zeroLength/ZeroLengthImpact3D.o
 
 REMO_LIBS = $(FE)/element/nonlinearBeamColumn/matrixutil/MatrixUtil.o \
@@ -353,6 +357,7 @@ ZHY_LIBS = $(FE)/material/nD/soil/FluidSolidPorousMaterial.o \
 	$(FE)/material/nD/soil/MultiYieldSurfaceClay.o \
 	$(FE)/material/nD/soil/PressureDependMultiYield.o \
 	$(FE)/material/nD/soil/PressureDependMultiYield02.o \
+	$(FE)/material/nD/soil/PressureDependMultiYield03.o \
 	$(FE)/material/nD/soil/PressureIndependMultiYield.o \
 	$(FE)/material/nD/soil/T2Vector.o \
 	$(FE)/element/UP-ucsd/BrickUP.o \
@@ -420,6 +425,7 @@ RECORDER_LIBS = $(FE)/recorder/Recorder.o \
 	$(FE)/recorder/DamageRecorder.o \
 	$(FE)/recorder/RemoveRecorder.o \
 	$(FE)/recorder/PVDRecorder.o \
+	$(FE)/recorder/GmshRecorder.o \
 	$(FE)/recorder/MPCORecorder.o 
 
 
@@ -504,7 +510,9 @@ ELE_LIBS   =  $(FE)/element/Element.o \
 	$(FE)/element/feap/fElement.o \
 	$(FE)/element/feap/fElmt02.o \
 	$(FE)/element/dispBeamColumn/AxEqDispBeamColumn2d.o \
+	$(FE)/element/dispBeamColumn/TimoshenkoBeamColumn2d.o \
 	$(FE)/element/dispBeamColumn/DispBeamColumn2d.o \
+	$(FE)/element/dispBeamColumn/DispBeamColumnNL2d.o \
 	$(FE)/element/dispBeamColumn/DispBeamColumn2dThermal.o \
 	$(FE)/element/dispBeamColumn/DispBeamColumn3d.o \
 	$(FE)/element/dispBeamColumn/DispBeamColumn3dThermal.o \
@@ -514,10 +522,12 @@ ELE_LIBS   =  $(FE)/element/Element.o \
 	$(FE)/element/dispBeamColumnInt/FiberSection2dInt.o \
 	$(FE)/element/dispBeamColumnInt/LinearCrdTransf2dInt.o \
 	$(FE)/element/elasticBeamColumn/ElasticBeam2d.o \
+	$(FE)/element/elasticBeamColumn/WheelRail.o \
 	$(FE)/element/elasticBeamColumn/ModElasticBeam2d.o \
 	$(FE)/element/elasticBeamColumn/ElasticBeam3d.o \
 	$(FE)/element/elasticBeamColumn/ElasticTimoshenkoBeam2d.o \
 	$(FE)/element/elasticBeamColumn/ElasticTimoshenkoBeam3d.o \
+	$(FE)/element/elasticBeamColumn/WheelRail.o \
 	$(FE)/element/fourNodeQuad/FourNodeQuad.o \
 	$(FE)/element/fourNodeQuad/FourNodeQuad3d.o \
 	$(FE)/element/fourNodeQuad/FourNodeQuadWithSensitivity.o \
@@ -578,23 +588,32 @@ ELE_LIBS   =  $(FE)/element/Element.o \
 	$(FE)/element/triangle/Tri31.o \
 	$(FE)/element/PFEMElement/PFEMElement2D.o \
 	$(FE)/element/PFEMElement/PFEMElement3D.o \
-	$(FE)/element/PFEMElement/PFEMMesher2D.o \
-	$(FE)/element/PFEMElement/PFEMMesher3D.o \
 	$(FE)/element/PFEMElement/PFEMElement2DCompressible.o \
 	$(FE)/element/PFEMElement/PFEMElement2DBubble.o \
+	$(FE)/element/PFEMElement/PFEMElement3DBubble.o \
 	$(FE)/element/PFEMElement/PFEMElement2Dmini.o \
 	$(FE)/element/PFEMElement/PFEMElement2DFIC.o \
+	$(FE)/element/PFEMElement/PFEMElement2DQuasi.o \
+	$(FE)/element/PFEMElement/MINI.o \
 	$(FE)/element/PFEMElement/LineMesh.o \
 	$(FE)/element/PFEMElement/TriMesh.o \
+	$(FE)/element/PFEMElement/TetMesh.o \
+	$(FE)/element/PFEMElement/QuadMesh.o \
 	$(FE)/element/PFEMElement/TriangleMeshGenerator.o \
+	$(FE)/element/PFEMElement/TetMeshGenerator.o \
+	$(FE)/element/PFEMElement/LineMeshGenerator.o \
+	$(FE)/element/PFEMElement/QuadMeshGenerator.o \
 	$(FE)/element/PFEMElement/tetgen.o \
 	$(FE)/element/PFEMElement/predicates.o \
 	$(FE)/element/PFEMElement/triangle.o \
 	$(FE)/element/PFEMElement/BackgroundMesh.o \
 	$(FE)/element/PFEMElement/ParticleGroup.o \
 	$(FE)/element/PFEMElement/Particle.o \
-	$(FE)/element/PFEMElement/BackgroundFixData.o \
-	$(FE)/element/PFEMElement/BackgroundGrid.o \
+	$(FE)/element/PFEMElement/BackgroundDef.o \
+	$(FE)/element/PFEMElement/TaylorHood2D.o \
+	$(FE)/element/PFEMElement/TriGaussPoints.o \
+	$(FE)/element/PFEMElement/HigherOrder.o \
+	$(FE)/element/PFEMElement/Mesh.o \
 	$(FE)/element/UWelements/SSPquad.o \
 	$(FE)/element/UWelements/SSPquadUP.o \
 	$(FE)/element/UWelements/SSPbrick.o \
@@ -606,6 +625,7 @@ ELE_LIBS   =  $(FE)/element/Element.o \
 	$(FE)/element/UWelements/QuadBeamEmbedContact.o \
 	$(FE)/element/catenaryCable/CatenaryCable.o \
 	$(FE)/element/tetrahedron/FourNodeTetrahedron.o \
+	$(FE)/element/absorbentBoundaries/LysmerTriangle.o \
 	$(FE)/element/UWelements/EmbeddedBeamInterfaceL.o \
 	$(FE)/element/UWelements/EmbeddedBeamInterfaceP.o \
 	$(FE)/element/UWelements/EmbeddedEPBeamInterface.o \
@@ -619,6 +639,7 @@ ELE_LIBS   =  $(FE)/element/Element.o \
 ifdef DAMAGE2P_FLAG
 	DAMAGE_2P = $(FE)/material/nD/Damage2p.o $(FE)/material/nD/Damage2p3D.o $(FE)/material/nD/Damage2ppstress.o \
 	$(FE)/material/nD/Concrete.o $(FE)/material/nD/CPlaneStress.o $(FE)/material/nD/CPlaneStress2d.o $(FE)/material/nD/CPlaneStrain.o $(FE)/material/nD/CThreeDimensional.o 
+
 else
 	DAMAGE_2P =
 endif
@@ -656,11 +677,13 @@ MATERIAL_LIBS   =  $(FE)/material/Material.o \
 	$(FE)/material/uniaxial/MultiLinear.o \
 	$(FE)/material/uniaxial/HookGap.o \
 	$(FE)/material/uniaxial/HardeningMaterial.o \
+	$(FE)/material/uniaxial/HardeningMaterial2.o \
 	$(FE)/material/uniaxial/ParallelMaterial.o \
 	$(FE)/material/uniaxial/SeriesMaterial.o \
 	$(FE)/material/uniaxial/Neoprene.o \
 	$(FE)/material/uniaxial/Concrete01.o \
 	$(FE)/material/uniaxial/Concrete02.o \
+	$(FE)/material/uniaxial/Concrete02IS.o \
 	$(FE)/material/uniaxial/Concrete04.o \
 	$(FE)/material/uniaxial/Concrete06.o \
 	$(FE)/material/uniaxial/Concrete07.o \
@@ -679,6 +702,7 @@ MATERIAL_LIBS   =  $(FE)/material/Material.o \
 	$(FE)/material/uniaxial/ConcreteCM.o \
 	$(FE)/material/uniaxial/RambergOsgoodSteel.o \
 	$(FE)/material/uniaxial/Steel02.o \
+	$(FE)/material/uniaxial/Steel02Fatigue.o \
 	$(FE)/material/uniaxial/Steel4.o \
 	$(FE)/material/uniaxial/Steel2.o \
 	$(FE)/material/uniaxial/OriginCentered.o \
@@ -745,14 +769,34 @@ MATERIAL_LIBS   =  $(FE)/material/Material.o \
 	$(FE)/material/uniaxial/SteelBRB.o \
 	$(FE)/material/uniaxial/GNGMaterial.o \
 	$(FE)/material/uniaxial/SelfCenteringMaterial.o \
+	$(FE)/material/uniaxial/SPSW02.o \
+	$(FE)/material/uniaxial/MaterialState.o \
 	$(FE)/material/uniaxial/backbone/HystereticBackbone.o \
 	$(FE)/material/uniaxial/backbone/ArctangentBackbone.o \
 	$(FE)/material/uniaxial/backbone/TrilinearBackbone.o \
+	$(FE)/material/uniaxial/backbone/MultilinearBackbone.o \
 	$(FE)/material/uniaxial/backbone/ReeseSoftClayBackbone.o \
 	$(FE)/material/uniaxial/backbone/ReeseStiffClayBelowWS.o \
 	$(FE)/material/uniaxial/backbone/ReeseSandBackbone.o \
 	$(FE)/material/uniaxial/backbone/ManderBackbone.o \
 	$(FE)/material/uniaxial/backbone/RaynorBackbone.o \
+	$(FE)/material/uniaxial/stiffness/StiffnessDegradation.o \
+	$(FE)/material/uniaxial/stiffness/ConstantStiffnessDegradation.o \
+	$(FE)/material/uniaxial/stiffness/DuctilityStiffnessDegradation.o \
+	$(FE)/material/uniaxial/stiffness/EnergyStiffnessDegradation.o \
+	$(FE)/material/uniaxial/stiffness/PincheiraStiffnessDegradation.o \
+	$(FE)/material/uniaxial/strength/StrengthDegradation.o \
+	$(FE)/material/uniaxial/strength/ConstantStrengthDegradation.o \
+	$(FE)/material/uniaxial/strength/DuctilityStrengthDegradation.o \
+	$(FE)/material/uniaxial/strength/EnergyStrengthDegradation.o \
+	$(FE)/material/uniaxial/strength/ACIStrengthDegradation.o \
+	$(FE)/material/uniaxial/strength/PetrangeliStrengthDegradation.o \
+	$(FE)/material/uniaxial/strength/SectionStrengthDegradation.o \
+	$(FE)/material/uniaxial/unloading/UnloadingRule.o \
+	$(FE)/material/uniaxial/unloading/ConstantUnloadingRule.o \
+	$(FE)/material/uniaxial/unloading/TakedaUnloadingRule.o \
+	$(FE)/material/uniaxial/unloading/EnergyUnloadingRule.o \
+	$(FE)/material/uniaxial/unloading/KarsanUnloadingRule.o \
 	$(FE)/material/nD/NDMaterial.o \
 	$(FE)/material/nD/PlaneStressLayeredMaterial.o \
 	$(FE)/material/nD/PlaneStressRebarMaterial.o \
@@ -836,6 +880,7 @@ MATERIAL_LIBS   =  $(FE)/material/Material.o \
 	$(FE)/material/nD/PlateRebarMaterialThermal.o \
 	$(FE)/material/nD/BeamFiberMaterial.o \
 	$(FE)/material/nD/BeamFiberMaterial2d.o \
+	$(FE)/material/nD/BeamFiberMaterial2dPS.o \
 	$(FE)/material/nD/cyclicSoil/MultiaxialCyclicPlasticity.o \
 	$(FE)/material/nD/cyclicSoil/MultiaxialCyclicPlasticityPlaneStrain.o \
 	$(FE)/material/nD/cyclicSoil/MultiaxialCyclicPlasticity3D.o \
@@ -931,6 +976,8 @@ SECTION_LIBS = $(FE)/material/section/SectionForceDeformation.o \
 	$(FE)/material/section/LayeredShellFiberSection.o \
 	$(FE)/material/section/integration/SectionIntegration.o \
 	$(FE)/material/section/integration/RCSectionIntegration.o \
+	$(FE)/material/section/integration/RCCircularSectionIntegration.o \
+	$(FE)/material/section/integration/RCTunnelSectionIntegration.o \
 	$(FE)/material/section/integration/WideFlangeSectionIntegration.o \
 	$(FE)/material/section/integration/RCTBeamSectionIntegration.o \
 	$(FE)/material/section/integration/TubeSectionIntegration.o \
@@ -1010,9 +1057,15 @@ SequentialSysOfEqn_LIBS =	$(FE)/system_of_eqn/linearSOE/LinearSOE.o \
 	$(FE)/system_of_eqn/linearSOE/sparseGEN/PFEMSolver_Umfpack.o \
 	$(FE)/system_of_eqn/linearSOE/sparseGEN/PFEMCompressibleLinSOE.o \
 	$(FE)/system_of_eqn/linearSOE/sparseGEN/PFEMCompressibleSolver.o \
+	$(FE)/system_of_eqn/linearSOE/sparseGEN/PFEMQuasiLinSOE.o \
+	$(FE)/system_of_eqn/linearSOE/sparseGEN/PFEMQuasiSolver.o \
 	$(FE)/system_of_eqn/linearSOE/sparseGEN/SparseGenColLinSolver.o \
 	$(FE)/system_of_eqn/linearSOE/sparseGEN/SparseGenRowLinSOE.o \
 	$(FE)/system_of_eqn/linearSOE/sparseGEN/SparseGenRowLinSolver.o \
+	$(FE)/system_of_eqn/linearSOE/sparseGEN/PFEMDiaLinSOE.o \
+	$(FE)/system_of_eqn/linearSOE/sparseGEN/PFEMDiaSolver.o \
+	$(FE)/system_of_eqn/linearSOE/sparseGEN/PFEMSolver_Laplace.o \
+	$(FE)/system_of_eqn/linearSOE/sparseGEN/PFEMSolver_LumpM.o \
 	$(SUPER_LU_OBJ) \
 	$(FE)/system_of_eqn/linearSOE/umfGEN/UmfpackGenLinSOE.o \
 	$(FE)/system_of_eqn/linearSOE/umfGEN/UmfpackGenLinSolver.o \
@@ -1079,9 +1132,11 @@ DOMAIN_LIBS =  $(FE)/domain/component/DomainComponent.o \
 	$(FE)/domain/load/Beam3dThermalAction.o \
 	$(FE)/domain/load/ShellThermalAction.o \
 	$(FE)/domain/load/Beam3dUniformLoad.o \
+	$(FE)/domain/load/Beam3dPartialUniformLoad.o \
 	$(FE)/domain/load/Beam3dPointLoad.o \
 	$(FE)/domain/load/BrickSelfWeight.o \
 	$(FE)/domain/load/SurfaceLoader.o \
+	$(FE)/domain/load/LysmerVelocityLoader.o \
 	$(FE)/domain/load/SelfWeight.o \
 	$(FE)/domain/pattern/LoadPattern.o \
 	$(FE)/domain/pattern/FireLoadPattern.o \
