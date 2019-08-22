@@ -105,7 +105,7 @@ stressDensity::stressDensity(int tag, int classTag, double massDen,
     strainNext(3),
     materialParam(25),
     initialTangent(3,3),
-    currentTangent(3,3),
+    currentTangent(3,3)
 {
     massDensity = massDen;
     materialParam(0)  = eInit;
@@ -147,7 +147,7 @@ stressDensity::stressDensity()
     strainNext(3),
     materialParam(25),
     initialTangent(3,3),
-    currentTangent(3,3),
+    currentTangent(3,3)
 {
     theStage = 0;
     for (int i=0; i<24; i++) {

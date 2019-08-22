@@ -1284,7 +1284,7 @@ c
        common / axil  /  svin, rf0in, pwpr, ainp
         common / strn  / eta(3), etacum(3), etarev(3), etar(3), etad(3)
        common / tstr  / fmuf, depsx, depsy
-       dimension props(nmats), oths(10)
+       dimension props(nmats), oths(12)
 
 c
        iitr = oths(11)
