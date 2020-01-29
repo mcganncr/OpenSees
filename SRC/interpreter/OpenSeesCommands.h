@@ -285,6 +285,7 @@ int OPS_loadConst();
 int OPS_calculateNodalReactions();
 int OPS_rayleighDamping();
 int OPS_setTime();
+int OPS_setCreep();
 int OPS_removeObject();
 int OPS_addNodalMass();
 int OPS_buildModel();
@@ -354,7 +355,6 @@ int OPS_stopTimer();
 int OPS_modalDamping();
 int OPS_modalDampingQ();
 int OPS_neesMetaData();
-int OPS_neesUpload();
 int OPS_defaultUnits();
 int OPS_totalCPU();
 int OPS_solveCPU();
@@ -406,6 +406,7 @@ void* OPS_PFEMSolver();
 void* OPS_PFEMCompressibleSolver();
 void* OPS_PFEMQuasiSolver();
 void* OPS_PFEMSolver_Umfpack();
+void* OPS_PFEMSolver_Mumps();
 void* OPS_PFEMSolver_Laplace();
 void* OPS_PFEMSolver_LumpM();
 void* OPS_SymSparseLinSolver();
@@ -494,7 +495,6 @@ void* OPS_BFGS();
 //              UCFiber, TclModelBuilderYS_SectionCommand, yieldSurface_BC,
 //              ysEvolutionModel, plasticMaterial, cyclicModel, damageModel,
 //              FirePattern, PySimple1Gen, TzSimple1Gen, Hfiber,
-//              stiffnessDegradation, unloadingRule, strengthDegradation,
 //              hystereticBackbone, updateMaterialStage, updateMaterials,
 //              loadPackage
 #endif
